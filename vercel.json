@@ -1,11 +1,22 @@
 {
-  "services": {
-    "backend": {
-      "root": "backend",
-      "entrypoint": "src/server.ts"
+  "builds": [
+    {
+      "src": "backend/src/server.ts",
+      "use": "@vercel/node"
     },
-    "frontend": {
-      "root": "."
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
     }
-  }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/src/server.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
 }
