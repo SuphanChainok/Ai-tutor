@@ -48,13 +48,12 @@ const userSchema = new Schema<IUser>(
 );
 
 // Hash password ก่อนบันทึกลง Database
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    return next();
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password!, salt);
-  next();
 });
 
 // Method เปรียบเทียบ Password ตอน Login
