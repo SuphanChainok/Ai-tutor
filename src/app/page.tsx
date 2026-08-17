@@ -62,7 +62,7 @@ export default function Home() {
 
   const fetchHistory = async (authToken: string) => {
     try {
-      const res = await fetch('http://localhost:5000/api/tutor/history', {
+      const res = await fetch('/api/tutor/history', {
         headers: { Authorization: formatAuthHeader(authToken) },
       });
       const data = await res.json();
@@ -88,7 +88,7 @@ export default function Home() {
     setMessages((prev) => [...prev, tempMessage]);
 
     try {
-      const res = await fetch('http://localhost:5000/api/tutor/ask', {
+      const res = await fetch('/api/tutor/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

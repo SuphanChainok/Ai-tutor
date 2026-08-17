@@ -9,7 +9,7 @@ function appExpress() {
   const instance = express();
 
   // Middleware
-  instance.use(cors());
+  instance.use(cors({ origin: '*' }));
   instance.use(express.json());
 
   // Health Check Endpoint
