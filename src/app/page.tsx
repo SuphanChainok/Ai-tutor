@@ -14,7 +14,9 @@ import {
   ShieldCheck, 
   LogOut, 
   Plus,
-  MessageSquare
+  MessageSquare,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -38,6 +40,7 @@ export default function Home() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [historyList, setHistoryList] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -136,7 +139,11 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-[#0B0E13] text-[#EDE8DD] font-sans antialiased">
       {/* Sidebar */}
-      <aside className="w-72 shrink-0 bg-[#0E1218] border-r border-[#22283349] p-5 hidden md:flex md:flex-col justify-between relative">
+      <aside
+        className={`shrink-0 bg-[#0E1218] border-r border-[#22283349] hidden md:flex md:flex-col justify-between relative transition-all duration-300 ease-in-out overflow-hidden ${
+          isSidebarOpen ? 'w-72 p-5' : 'w-16 p-3'
+        }`}
+      >
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
@@ -147,49 +154,79 @@ export default function Home() {
         
         <div className="relative flex flex-col h-[calc(100vh-100px)] min-h-0">
           {/* Header */}
-          <div className="flex items-center gap-3 mb-6 shrink-0">
-            <div className="w-10 h-10 rounded-full border border-[#C9A24B66] flex items-center justify-center text-[#E4C878] bg-[#151A22]">
+          <div className={`flex items-center gap-3 mb-6 shrink-0 ${isSidebarOpen ? '' : 'justify-center'}`}>
+            <div className="w-10 h-10 rounded-full border border-[#C9A24B66] flex items-center justify-center text-[#E4C878] bg-[#151A22] shrink-0">
               <GraduationCap size={20} strokeWidth={1.75} />
             </div>
-            <div>
-              <div className="font-display text-lg leading-none text-[#EDE8DD]">AI Tutor</div>
-              <div className="font-mono text-[10px] tracking-[0.2em] text-[#5C6472] uppercase mt-1">
-                Private Study
+            {isSidebarOpen && (
+              <div className="transition-opacity duration-200">
+                <div className="font-display text-lg leading-none text-[#EDE8DD]">AI Tutor</div>
+                <div className="font-mono text-[10px] tracking-[0.2em] text-[#5C6472] uppercase mt-1">
+                  Private Study
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* New Chat Button */}
+          {/* Toggle Button */}
           <button
-            onClick={handleNewChat}
-            className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#C9A24B] hover:bg-[#E4C878] text-[#0B0E13] font-medium py-2.5 px-4 transition-colors mb-6 text-sm shrink-0 shadow-md"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className={`absolute top-0 right-0 z-10 w-8 h-8 flex items-center justify-center rounded-md text-[#5C6472] hover:text-[#E4C878] hover:bg-[#151A2280] transition-colors ${isSidebarOpen ? '-mr-1 -mt-1' : '-mr-1 -mt-1'}`}
+            title={isSidebarOpen ? 'พับ Sidebar' : 'กาง Sidebar'}
           >
-            <Plus size={16} strokeWidth={2.5} />
-            <span>ถามคำถามใหม่</span>
+            {isSidebarOpen ? (
+              <PanelLeftClose size={16} strokeWidth={1.75} />
+            ) : (
+              <PanelLeftOpen size={16} strokeWidth={1.75} />
+            )}
           </button>
 
+          {/* New Chat Button */}
+          {isSidebarOpen ? (
+            <button
+              onClick={handleNewChat}
+              className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#C9A24B] hover:bg-[#E4C878] text-[#0B0E13] font-medium py-2.5 px-4 transition-colors mb-6 text-sm shrink-0 shadow-md"
+            >
+              <Plus size={16} strokeWidth={2.5} />
+              <span>ถามคำถามใหม่</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleNewChat}
+              className="w-full flex items-center justify-center rounded-lg bg-[#C9A24B] hover:bg-[#E4C878] text-[#0B0E13] py-2.5 transition-colors mb-6 shrink-0 shadow-md"
+              title="ถามคำถามใหม่"
+            >
+              <Plus size={16} strokeWidth={2.5} />
+            </button>
+          )}
+
           {/* Topics Section */}
-          <div className="mb-6 shrink-0">
-            <div className="mb-2">
-              <span className="font-mono text-[10px] tracking-[0.2em] text-[#5C6472] uppercase">
-                เลือกหัวข้อวิชา
-              </span>
-            </div>
-            <nav className="space-y-1">
+          <div className={`${isSidebarOpen ? 'mb-6' : 'mb-4'} shrink-0`}>
+            {isSidebarOpen && (
+              <div className="mb-2">
+                <span className="font-mono text-[10px] tracking-[0.2em] text-[#5C6472] uppercase">
+                  เลือกหัวข้อวิชา
+                </span>
+              </div>
+            )}
+            <nav className={isSidebarOpen ? 'space-y-1' : 'space-y-1'}>
               {TOPICS.map(({ id, label, icon: Icon }) => {
                 const active = id === topic;
                 return (
                   <button
                     key={id}
                     onClick={() => setTopic(id)}
-                    className={`w-full flex items-center gap-2.5 rounded-md px-3 py-2 text-xs text-left transition-all border-l-2 ${
+                    title={label}
+                    className={`w-full flex items-center rounded-md text-xs text-left transition-all border-l-2 ${
+                      isSidebarOpen ? 'gap-2.5 px-3 py-2' : 'justify-center px-0 py-2'
+                    } ${
                       active
                         ? 'bg-[#C9A24B14] border-[#C9A24B] text-[#E4C878]'
                         : 'border-transparent text-[#8B93A1] hover:text-[#EDE8DD] hover:bg-[#151A2280]'
                     }`}
                   >
                     <Icon size={15} strokeWidth={1.75} className="shrink-0" />
-                    <span className="font-sans truncate">{label}</span>
+                    {isSidebarOpen && <span className="font-sans truncate">{label}</span>}
                   </button>
                 );
               })}
@@ -198,25 +235,32 @@ export default function Home() {
 
           {/* Chat History List */}
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden border-t border-[#22283349] pt-4">
-            <div className="flex items-center gap-1.5 mb-2.5 shrink-0 text-[#5C6472]">
-              <History size={13} />
-              <span className="font-mono text-[10px] tracking-[0.2em] uppercase">
-                ประวัติการถาม
-              </span>
-            </div>
+            {isSidebarOpen && (
+              <div className="flex items-center gap-1.5 mb-2.5 shrink-0 text-[#5C6472]">
+                <History size={13} />
+                <span className="font-mono text-[10px] tracking-[0.2em] uppercase">
+                  ประวัติการถาม
+                </span>
+              </div>
+            )}
             
             <div className="study-scroll flex-1 overflow-y-auto space-y-1 pr-1">
               {historyList.length === 0 ? (
-                <div className="text-[11px] text-[#5C6472] italic py-2">ยังไม่มีประวัติการถาม</div>
+                isSidebarOpen && (
+                  <div className="text-[11px] text-[#5C6472] italic py-2">ยังไม่มีประวัติการถาม</div>
+                )
               ) : (
                 historyList.map((item, idx) => (
                   <button
                     key={item._id || idx}
                     onClick={() => handleSelectHistoryItem(item)}
-                    className="w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-xs text-[#8B93A1] hover:text-[#EDE8DD] hover:bg-[#151A2280] transition-colors text-left group"
+                    title={item.question}
+                    className={`w-full flex items-center rounded-md text-xs text-[#8B93A1] hover:text-[#EDE8DD] hover:bg-[#151A2280] transition-colors text-left group ${
+                      isSidebarOpen ? 'gap-2 px-2.5 py-2' : 'justify-center px-0 py-2'
+                    }`}
                   >
                     <MessageSquare size={13} className="shrink-0 text-[#5C6472] group-hover:text-[#C9A24B]" />
-                    <span className="truncate flex-1 font-sans">{item.question}</span>
+                    {isSidebarOpen && <span className="truncate flex-1 font-sans">{item.question}</span>}
                   </button>
                 ))
               )}
@@ -228,10 +272,13 @@ export default function Home() {
         <div className="relative pt-4 border-t border-[#22283349] shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 text-xs text-[#8B93A1] hover:text-red-400 transition-colors"
+            title="ออกจากระบบ"
+            className={`w-full flex items-center text-xs text-[#8B93A1] hover:text-red-400 transition-colors ${
+              isSidebarOpen ? 'gap-2' : 'justify-center'
+            }`}
           >
             <LogOut size={14} strokeWidth={1.75} />
-            <span>ออกจากระบบ</span>
+            {isSidebarOpen && <span>ออกจากระบบ</span>}
           </button>
         </div>
       </aside>
