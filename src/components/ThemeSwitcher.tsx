@@ -3,50 +3,68 @@
 import { useState, useRef, useEffect } from 'react';
 import { Palette, Check } from 'lucide-react';
 
-export type ThemeId =
-  | 'midnight-gold'
-  | 'cyber-neon'
-  | 'emerald-green'
-  | 'clean-light'
-  | 'deep-space';
+export type ThemeMode = 'dark' | 'light' | 'gold' | 'cyberpunk' | 'forest';
 
-interface ThemeOption {
-  id: ThemeId;
+export interface ThemeConfig {
+  id: ThemeMode;
   label: string;
-  preview: { bg: string; surface: string; accent: string; text: string };
+  preview: { bg: string; accent: string };
+  bgImage: string;
+  overlay: string;
 }
 
-const THEMES: ThemeOption[] = [
-  {
-    id: 'midnight-gold',
-    label: 'Midnight Gold',
-    preview: { bg: '#0B0E13', surface: '#0E1218', accent: '#C9A24B', text: '#EDE8DD' },
+export const THEME_CONFIG: Record<ThemeMode, ThemeConfig> = {
+  dark: {
+    id: 'dark',
+    label: 'Dark',
+    preview: { bg: '#0B0E13', accent: '#C9A24B' },
+    bgImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1000&auto=format&fit=crop',
+    overlay: 'bg-black/60',
   },
-  {
-    id: 'cyber-neon',
-    label: 'Cyber Neon',
-    preview: { bg: '#0F1117', surface: '#13151D', accent: '#06D6E0', text: '#E2E8F0' },
+  light: {
+    id: 'light',
+    label: 'Light',
+    preview: { bg: '#F8FAFC', accent: '#3B82F6' },
+    bgImage: '',
+    overlay: '',
   },
-  {
-    id: 'emerald-green',
-    label: 'Emerald Green',
-    preview: { bg: '#09120E', surface: '#0C1610', accent: '#10B981', text: '#E8F5EC' },
+  gold: {
+    id: 'gold',
+    label: 'Gold',
+    preview: { bg: '#0F0D08', accent: '#D4A843' },
+    bgImage: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1000&auto=format&fit=crop',
+    overlay: 'bg-black/70',
   },
-  {
-    id: 'clean-light',
-    label: 'Clean Light',
-    preview: { bg: '#F8FAFC', surface: '#F1F5F9', accent: '#3B82F6', text: '#1E293B' },
+  cyberpunk: {
+    id: 'cyberpunk',
+    label: 'Cyberpunk',
+    preview: { bg: '#0A0A12', accent: '#06D6E0' },
+    bgImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop',
+    overlay: 'bg-black/65',
   },
-  {
-    id: 'deep-space',
-    label: 'Deep Space',
-    preview: { bg: '#0A0E1A', surface: '#0E1324', accent: '#8B5CF6', text: '#E8ECF4' },
+  forest: {
+    id: 'forest',
+    label: 'Forest',
+    preview: { bg: '#0A120D', accent: '#10B981' },
+    bgImage: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1000&auto=format&fit=crop',
+    overlay: 'bg-black/65',
   },
-];
+};
+
+const THEME_LIST: ThemeConfig[] = Object.values(THEME_CONFIG);
+
+const STORAGE_KEY = 'ai-tutor-theme';
+
+export function getInitialTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'dark';
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved && saved in THEME_CONFIG) return saved as ThemeMode;
+  return 'dark';
+}
 
 interface Props {
-  current: ThemeId;
-  onChange: (theme: ThemeId) => void;
+  current: ThemeMode;
+  onChange: (theme: ThemeMode) => void;
 }
 
 export default function ThemeSwitcher({ current, onChange }: Props) {
@@ -64,42 +82,22 @@ export default function ThemeSwitcher({ current, onChange }: Props) {
   }, []);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative z-50" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
-        style={{
-          color: 'var(--text-muted)',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = 'var(--accent-hover)';
-          e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--accent-primary) 12%, transparent)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = 'var(--text-muted)';
-          e.currentTarget.style.backgroundColor = 'transparent';
-        }}
+        className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-hover)] hover:bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] transition-colors duration-200 shrink-0"
         title="เปลี่ยนธีม"
       >
         <Palette size={18} strokeWidth={1.75} />
       </button>
 
       {open && (
-        <div
-          className="absolute right-0 top-full mt-2 w-56 rounded-xl shadow-2xl z-50 py-1.5 border"
-          style={{
-            backgroundColor: 'var(--bg-elevated)',
-            borderColor: 'var(--border-input)',
-          }}
-        >
-          <div
-            className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase"
-            style={{ color: 'var(--text-subtle)' }}
-          >
+        <div className="absolute right-0 top-full mt-2 w-52 rounded-xl shadow-2xl z-[60] py-1.5 border border-[var(--border-input)] bg-[var(--bg-elevated)] transition-colors duration-200">
+          <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
             เลือกธีม
           </div>
 
-          {THEMES.map((theme) => {
+          {THEME_LIST.map((theme) => {
             const isActive = theme.id === current;
             return (
               <button
@@ -108,55 +106,42 @@ export default function ThemeSwitcher({ current, onChange }: Props) {
                   onChange(theme.id);
                   setOpen(false);
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors"
-                style={{
-                  backgroundColor: isActive
-                    ? 'color-mix(in srgb, var(--accent-primary) 10%, transparent)'
-                    : 'transparent',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor =
-                      'color-mix(in srgb, var(--accent-primary) 6%, transparent)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }
-                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors duration-200 ${
+                  isActive
+                    ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
+                    : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]'
+                }`}
               >
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   <div
-                    className="w-3.5 h-3.5 rounded-full border"
-                    style={{
-                      backgroundColor: theme.preview.bg,
-                      borderColor: 'var(--border-input)',
-                    }}
+                    className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                    style={{ backgroundColor: theme.preview.bg }}
                   />
                   <div
-                    className="w-3.5 h-3.5 rounded-full border"
-                    style={{
-                      backgroundColor: theme.preview.accent,
-                      borderColor: 'var(--border-input)',
-                    }}
+                    className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                    style={{ backgroundColor: theme.preview.accent }}
                   />
                 </div>
 
                 <span
-                  className="flex-1 text-xs font-sans"
-                  style={{
-                    color: isActive ? 'var(--accent-primary)' : 'var(--text-primary)',
-                  }}
+                  className={`flex-1 text-xs font-sans ${
+                    isActive ? 'text-[var(--accent)]' : 'text-[var(--text-main)]'
+                  }`}
                 >
                   {theme.label}
                 </span>
+
+                {theme.bgImage && (
+                  <span className="text-[9px] text-[var(--text-subtle)] font-mono">
+                    BG
+                  </span>
+                )}
 
                 {isActive && (
                   <Check
                     size={14}
                     strokeWidth={2.5}
-                    style={{ color: 'var(--accent-primary)' }}
+                    className="text-[var(--accent)] shrink-0"
                   />
                 )}
               </button>
