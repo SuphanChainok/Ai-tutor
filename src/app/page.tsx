@@ -457,31 +457,6 @@ export default function Home() {
             {isMenuOpen && (
               <div className="absolute right-0 top-full mt-2 w-56 rounded-xl shadow-2xl z-[70] py-1.5 border border-[var(--border-input)] bg-[var(--bg-elevated)] transition-colors duration-200">
                 <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
-                  เมนูนำทาง
-                </div>
-                {[
-                  { path: '/flashcards', label: 'Flashcards', icon: Layers, color: 'text-amber-400' },
-                  { path: '/quiz', label: 'Quiz แบบทดสอบ', icon: HelpCircle, color: 'text-emerald-400' },
-                  { path: '/progress', label: 'Progress ติดตามผล', icon: BarChart3, color: 'text-sky-400' },
-                ].map(({ path, label, icon: Icon, color }) => (
-                  <button
-                    key={path}
-                    onClick={() => {
-                      router.push(path);
-                      setIsMenuOpen(false);
-                      setIsMobileSidebarOpen(false);
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)] transition-colors duration-200"
-                  >
-                    <Icon size={15} strokeWidth={1.75} className={color} />
-                    <span className="flex-1 text-xs font-sans text-[var(--text-main)]">
-                      {label}
-                    </span>
-                  </button>
-                ))}
-
-                <div className="my-1.5 border-t border-[var(--border-input)]" />
-                <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
                   เลือกธีม
                 </div>
                 {Object.values(THEME_CONFIG).map((theme) => {
@@ -563,30 +538,6 @@ export default function Home() {
 
               {isMenuOpen && (
                 <div className="absolute right-0 top-full mt-2 w-56 rounded-xl shadow-2xl z-[70] py-1.5 border border-[var(--border-input)] bg-[var(--bg-elevated)] transition-colors duration-200">
-                  <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
-                    เมนูนำทาง
-                  </div>
-                  {[
-                    { path: '/flashcards', label: 'Flashcards', icon: Layers, color: 'text-amber-400' },
-                    { path: '/quiz', label: 'Quiz แบบทดสอบ', icon: HelpCircle, color: 'text-emerald-400' },
-                    { path: '/progress', label: 'Progress ติดตามผล', icon: BarChart3, color: 'text-sky-400' },
-                  ].map(({ path, label, icon: Icon, color }) => (
-                    <button
-                      key={path}
-                      onClick={() => {
-                        router.push(path);
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)] transition-colors duration-200"
-                    >
-                      <Icon size={15} strokeWidth={1.75} className={color} />
-                      <span className="flex-1 text-xs font-sans text-[var(--text-main)]">
-                        {label}
-                      </span>
-                    </button>
-                  ))}
-
-                  <div className="my-1.5 border-t border-[var(--border-input)]" />
                   <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
                     เลือกธีม
                   </div>
