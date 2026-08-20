@@ -95,6 +95,12 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleSelectTheme = (selectedTheme: ThemeMode) => {
+    setCurrentTheme(selectedTheme);
+    document.documentElement.className = selectedTheme;
+    setIsMenuOpen(false);
+  };
+
   const fetchHistory = async (authToken: string) => {
     try {
       const res = await fetch('/api/tutor/history', {
@@ -464,13 +470,10 @@ export default function Home() {
                   return (
                     <button
                       key={theme.id}
-                      onClick={() => {
-                        setCurrentTheme(theme.id);
-                        setIsMenuOpen(false);
-                      }}
+                      onClick={() => handleSelectTheme(theme.id)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors duration-200 ${
                         isActive
-                          ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
+                          ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] font-medium'
                           : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]'
                       }`}
                     >
