@@ -392,7 +392,7 @@ export default function Home() {
   );
 
   return (
-    <div className={`${currentTheme} flex h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-sans antialiased overflow-hidden transition-colors duration-200`}>
+    <div className={`${currentTheme} flex h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-sans antialiased overflow-hidden transition-colors duration-300`}>
       {/* ═══════════ DESKTOP SIDEBAR (md+) ═══════════ */}
       <aside
         className={`shrink-0 bg-[var(--bg-sidebar)] border-r border-[var(--border-primary)] hidden md:flex md:flex-col justify-between relative transition-all duration-300 ease-in-out overflow-hidden ${
@@ -549,13 +549,10 @@ export default function Home() {
                     return (
                       <button
                         key={theme.id}
-                        onClick={() => {
-                          setCurrentTheme(theme.id);
-                          setIsMenuOpen(false);
-                        }}
+                        onClick={() => handleSelectTheme(theme.id)}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors duration-200 ${
                           isActive
-                            ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
+                            ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] font-medium'
                             : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]'
                         }`}
                       >
