@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown';
 import {
   Send,
@@ -19,8 +19,13 @@ import {
   PanelLeftOpen,
   Menu,
   X,
+  Layers,
+  HelpCircle,
+  BarChart3,
+  Palette,
+  Check,
 } from 'lucide-react';
-import ThemeSwitcher, { ThemeMode, THEME_CONFIG, getInitialTheme } from '@/components/ThemeSwitcher';
+import { ThemeMode, THEME_CONFIG, getInitialTheme } from '@/components/ThemeSwitcher';
 
 interface ChatMessage {
   _id?: string;
@@ -48,7 +53,9 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>('dark');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const formatAuthHeader = (authToken: string) => {
@@ -77,6 +84,16 @@ export default function Home() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const fetchHistory = async (authToken: string) => {
     try {
@@ -258,6 +275,54 @@ export default function Home() {
           </nav>
         </div>
 
+        {/* Navigation Menu */}
+        <div className="mt-4 pt-4 border-t border-[#22283349] space-y-1 shrink-0">
+          <div className={`${compact ? 'px-3' : 'px-0 flex justify-center'} mb-2`}>
+            <span className="font-mono text-[10px] tracking-wider text-slate-500 uppercase">
+              เมนูการเรียนรู้
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              router.push('/flashcards');
+              setIsMobileSidebarOpen(false);
+            }}
+            title="Flashcards"
+            className={`w-full flex items-center gap-3 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-colors ${
+              compact ? 'px-3 py-2 justify-start' : 'justify-center px-0 py-2'
+            }`}
+          >
+            <Layers size={16} className="text-amber-400 shrink-0" />
+            {compact && <span>Flashcards</span>}
+          </button>
+          <button
+            onClick={() => {
+              router.push('/quiz');
+              setIsMobileSidebarOpen(false);
+            }}
+            title="Quiz แบบทดสอบ"
+            className={`w-full flex items-center gap-3 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-colors ${
+              compact ? 'px-3 py-2 justify-start' : 'justify-center px-0 py-2'
+            }`}
+          >
+            <HelpCircle size={16} className="text-emerald-400 shrink-0" />
+            {compact && <span>Quiz แบบทดสอบ</span>}
+          </button>
+          <button
+            onClick={() => {
+              router.push('/progress');
+              setIsMobileSidebarOpen(false);
+            }}
+            title="Progress ติดตามผล"
+            className={`w-full flex items-center gap-3 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-colors ${
+              compact ? 'px-3 py-2 justify-start' : 'justify-center px-0 py-2'
+            }`}
+          >
+            <BarChart3 size={16} className="text-sky-400 shrink-0" />
+            {compact && <span>Progress ติดตามผล</span>}
+          </button>
+        </div>
+
         {/* Chat History List */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden border-t border-[var(--border-primary)] pt-4 transition-colors duration-200">
           {compact && (
@@ -379,7 +444,87 @@ export default function Home() {
               <span className="truncate max-w-[80px]">{topic}</span>
             </span>
           </div>
-          <ThemeSwitcher current={currentTheme} onChange={setCurrentTheme} />
+          {/* Menu Button + Dropdown */}
+          <div className="relative z-[70]" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-hover)] hover:bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] transition-colors duration-200 shrink-0"
+              title="เปิดเมนู"
+            >
+              <Palette size={18} strokeWidth={1.75} />
+            </button>
+
+            {isMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 rounded-xl shadow-2xl z-[70] py-1.5 border border-[var(--border-input)] bg-[var(--bg-elevated)] transition-colors duration-200">
+                <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
+                  เมนูนำทาง
+                </div>
+                {[
+                  { path: '/flashcards', label: 'Flashcards', icon: Layers, color: 'text-amber-400' },
+                  { path: '/quiz', label: 'Quiz แบบทดสอบ', icon: HelpCircle, color: 'text-emerald-400' },
+                  { path: '/progress', label: 'Progress ติดตามผล', icon: BarChart3, color: 'text-sky-400' },
+                ].map(({ path, label, icon: Icon, color }) => (
+                  <button
+                    key={path}
+                    onClick={() => {
+                      router.push(path);
+                      setIsMenuOpen(false);
+                      setIsMobileSidebarOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)] transition-colors duration-200"
+                  >
+                    <Icon size={15} strokeWidth={1.75} className={color} />
+                    <span className="flex-1 text-xs font-sans text-[var(--text-main)]">
+                      {label}
+                    </span>
+                  </button>
+                ))}
+
+                <div className="my-1.5 border-t border-[var(--border-input)]" />
+                <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
+                  เลือกธีม
+                </div>
+                {Object.values(THEME_CONFIG).map((theme) => {
+                  const isActive = theme.id === currentTheme;
+                  return (
+                    <button
+                      key={theme.id}
+                      onClick={() => {
+                        setCurrentTheme(theme.id);
+                        setIsMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors duration-200 ${
+                        isActive
+                          ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
+                          : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1 shrink-0">
+                        <div
+                          className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                          style={{ backgroundColor: theme.preview.bg }}
+                        />
+                        <div
+                          className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                          style={{ backgroundColor: theme.preview.accent }}
+                        />
+                      </div>
+                      <span
+                        className={`flex-1 text-xs font-sans ${
+                          isActive ? 'text-[var(--accent)]' : 'text-[var(--text-main)]'
+                        }`}
+                      >
+                        {theme.label}
+                      </span>
+                      {isActive && (
+                        <Check size={14} strokeWidth={2.5} className="text-[var(--accent)] shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
           <button
             onClick={handleNewChat}
             className="w-11 h-11 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-hover)] hover:bg-[var(--bg-input)] transition-colors duration-200 shrink-0"
@@ -406,7 +551,86 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2">
-            <ThemeSwitcher current={currentTheme} onChange={setCurrentTheme} />
+            {/* Menu Button + Dropdown */}
+            <div className="relative z-[70]" ref={menuRef}>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-hover)] hover:bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] transition-colors duration-200 shrink-0"
+                title="เปิดเมนู"
+              >
+                <Palette size={18} strokeWidth={1.75} />
+              </button>
+
+              {isMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl shadow-2xl z-[70] py-1.5 border border-[var(--border-input)] bg-[var(--bg-elevated)] transition-colors duration-200">
+                  <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
+                    เมนูนำทาง
+                  </div>
+                  {[
+                    { path: '/flashcards', label: 'Flashcards', icon: Layers, color: 'text-amber-400' },
+                    { path: '/quiz', label: 'Quiz แบบทดสอบ', icon: HelpCircle, color: 'text-emerald-400' },
+                    { path: '/progress', label: 'Progress ติดตามผล', icon: BarChart3, color: 'text-sky-400' },
+                  ].map(({ path, label, icon: Icon, color }) => (
+                    <button
+                      key={path}
+                      onClick={() => {
+                        router.push(path);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)] transition-colors duration-200"
+                    >
+                      <Icon size={15} strokeWidth={1.75} className={color} />
+                      <span className="flex-1 text-xs font-sans text-[var(--text-main)]">
+                        {label}
+                      </span>
+                    </button>
+                  ))}
+
+                  <div className="my-1.5 border-t border-[var(--border-input)]" />
+                  <div className="px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--text-subtle)]">
+                    เลือกธีม
+                  </div>
+                  {Object.values(THEME_CONFIG).map((theme) => {
+                    const isActive = theme.id === currentTheme;
+                    return (
+                      <button
+                        key={theme.id}
+                        onClick={() => {
+                          setCurrentTheme(theme.id);
+                          setIsMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors duration-200 ${
+                          isActive
+                            ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
+                            : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1 shrink-0">
+                          <div
+                            className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                            style={{ backgroundColor: theme.preview.bg }}
+                          />
+                          <div
+                            className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                            style={{ backgroundColor: theme.preview.accent }}
+                          />
+                        </div>
+                        <span
+                          className={`flex-1 text-xs font-sans ${
+                            isActive ? 'text-[var(--accent)]' : 'text-[var(--text-main)]'
+                          }`}
+                        >
+                          {theme.label}
+                        </span>
+                        {isActive && (
+                          <Check size={14} strokeWidth={2.5} className="text-[var(--accent)] shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
             <button
               onClick={handleNewChat}
               className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--accent-hover)] bg-[var(--bg-input)] border border-[var(--border-input)] hover:border-[color-mix(in_srgb,var(--accent)_40%,transparent)] px-3 py-1.5 rounded-md transition-all duration-200"
