@@ -95,7 +95,8 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelectTheme = (selectedTheme: ThemeMode) => {
+  const handleSelectTheme = (selectedTheme: ThemeMode, e?: React.SyntheticEvent) => {
+    if (e) e.stopPropagation();
     setCurrentTheme(selectedTheme);
     document.documentElement.className = selectedTheme;
     setIsMenuOpen(false);
@@ -470,30 +471,37 @@ export default function Home() {
                   return (
                     <button
                       key={theme.id}
-                      onClick={() => handleSelectTheme(theme.id)}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors duration-200 ${
+                      type="button"
+                      onClick={(e) => handleSelectTheme(theme.id, e)}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        handleSelectTheme(theme.id, e);
+                      }}
+                      className={`w-full flex items-center justify-between gap-2.5 px-3 py-2.5 text-left rounded-lg transition-all cursor-pointer touch-manipulation ${
                         isActive
                           ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] font-medium'
-                          : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]'
+                          : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)] active:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]'
                       }`}
                     >
-                      <div className="flex items-center gap-1 shrink-0">
-                        <div
-                          className="w-4 h-4 rounded-full border border-[var(--border-input)]"
-                          style={{ backgroundColor: theme.preview.bg }}
-                        />
-                        <div
-                          className="w-4 h-4 rounded-full border border-[var(--border-input)]"
-                          style={{ backgroundColor: theme.preview.accent }}
-                        />
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-1 shrink-0">
+                          <div
+                            className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                            style={{ backgroundColor: theme.preview.bg }}
+                          />
+                          <div
+                            className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                            style={{ backgroundColor: theme.preview.accent }}
+                          />
+                        </div>
+                        <span
+                          className={`text-xs font-sans ${
+                            isActive ? 'text-[var(--accent)]' : 'text-[var(--text-main)]'
+                          }`}
+                        >
+                          {theme.label}
+                        </span>
                       </div>
-                      <span
-                        className={`flex-1 text-xs font-sans ${
-                          isActive ? 'text-[var(--accent)]' : 'text-[var(--text-main)]'
-                        }`}
-                      >
-                        {theme.label}
-                      </span>
                       {isActive && (
                         <Check size={14} strokeWidth={2.5} className="text-[var(--accent)] shrink-0" />
                       )}
@@ -549,30 +557,37 @@ export default function Home() {
                     return (
                       <button
                         key={theme.id}
-                        onClick={() => handleSelectTheme(theme.id)}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors duration-200 ${
+                        type="button"
+                        onClick={(e) => handleSelectTheme(theme.id, e)}
+                        onTouchEnd={(e) => {
+                          e.preventDefault();
+                          handleSelectTheme(theme.id, e);
+                        }}
+                        className={`w-full flex items-center justify-between gap-2.5 px-3 py-2.5 text-left rounded-lg transition-all cursor-pointer touch-manipulation ${
                           isActive
                             ? 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] font-medium'
-                            : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]'
+                            : 'hover:bg-[color-mix(in_srgb,var(--accent)_6%,transparent)] active:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]'
                         }`}
                       >
-                        <div className="flex items-center gap-1 shrink-0">
-                          <div
-                            className="w-4 h-4 rounded-full border border-[var(--border-input)]"
-                            style={{ backgroundColor: theme.preview.bg }}
-                          />
-                          <div
-                            className="w-4 h-4 rounded-full border border-[var(--border-input)]"
-                            style={{ backgroundColor: theme.preview.accent }}
-                          />
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex items-center gap-1 shrink-0">
+                            <div
+                              className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                              style={{ backgroundColor: theme.preview.bg }}
+                            />
+                            <div
+                              className="w-4 h-4 rounded-full border border-[var(--border-input)]"
+                              style={{ backgroundColor: theme.preview.accent }}
+                            />
+                          </div>
+                          <span
+                            className={`text-xs font-sans ${
+                              isActive ? 'text-[var(--accent)]' : 'text-[var(--text-main)]'
+                            }`}
+                          >
+                            {theme.label}
+                          </span>
                         </div>
-                        <span
-                          className={`flex-1 text-xs font-sans ${
-                            isActive ? 'text-[var(--accent)]' : 'text-[var(--text-main)]'
-                          }`}
-                        >
-                          {theme.label}
-                        </span>
                         {isActive && (
                           <Check size={14} strokeWidth={2.5} className="text-[var(--accent)] shrink-0" />
                         )}
